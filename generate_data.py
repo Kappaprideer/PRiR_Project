@@ -2,8 +2,9 @@ from pathlib import Path
 import random
     
 def generate_random_data(file_path: Path, num_elements: int, value_range: int):
-    for _ in range(num_elements):
-        file_path.write_text(f"{random.randint(0, value_range)}\n")
+    with open(file_path, 'w') as file:
+        for _ in range(num_elements):
+            file.write(f"{random.randint(0, value_range)}\n")
     print(f"Generated {num_elements} random integers in range 0 to {value_range} at {file_path}")
 
 
