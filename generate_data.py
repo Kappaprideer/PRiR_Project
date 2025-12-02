@@ -23,7 +23,8 @@ def generate_data_with_duplicates(file_path: Path, num_elements: int, unique_val
 
 if __name__ == "__main__":
 
-    generate_random_data(Path("data/random_data.txt"), 10000, 10000)
-    generate_almost_sorted_data(Path("data/almost_sorted_data.txt"), 10000, 50)
-    generate_data_with_duplicates(Path("data/data_with_duplicates.txt"), 10000, 10)
+    for numbers_count in [1000, 100000, 1000000]:
+        generate_random_data(Path(f"data/random_data_{numbers_count}.txt"), numbers_count, numbers_count)
+        generate_almost_sorted_data(Path(f"data/almost_sorted_data_{numbers_count}.txt"), numbers_count, 100)
+        generate_data_with_duplicates(Path(f"data/data_with_duplicates_{numbers_count}.txt"), numbers_count, 20)
     
