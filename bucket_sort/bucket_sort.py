@@ -33,10 +33,27 @@ def get_data(path:Path) -> list[int]:
     return lst
 
 if __name__ == "__main__":
-    start_time = time.time()
-    workdir = pathlib.Path(__file__).parent.parent
-    data_path = workdir / "data/random_data.txt"
-    data = get_data(data_path)
-    num_buckets = 4
-    sorted_data = bucket_sort(data, num_buckets)
-    print("Execution time:", time.time() - start_time)
+    print("data_name,sample_size,time")
+
+    for number in [1000, 100000, 1000000]:
+        for name in ["almost_sorted_data", "data_with_duplicates", "random_data"]:
+            sum = 0
+            for _ in range(10):
+
+                workdir = pathlib.Path(__file__).parent.parent
+                data_path =  f"../data/{name}_{number}.txt"
+                with open(data_path, 'r') as f:
+                    data = [int(line.strip()) for line in f]
+                        
+                num_buckets = 4
+
+                start_time = time.time()
+
+                sorted_data = bucket_sort(data, num_buckets)
+                
+                end_time = time.time()
+
+                execution_time = end_time - start_time
+                sum += execution_time
+    
+            print(f"{name},{number},{sum/10:.6f}")
