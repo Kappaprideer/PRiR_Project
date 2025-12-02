@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define NUM_FILES 9
 
 // Scalanie dwóch posortowanych fragmentów
 void merge(int *arr, int left, int mid, int right) {
@@ -76,41 +81,66 @@ int* load_numbers(const char *filename, int *count) {
     return arr;
 }
 
+
+int extract_number_from_filename(const char *filename) {
+    // Szukamy pierwszej liczby w nazwie pliku
+    int number = 0;
+    while (*filename) {
+        if (isdigit(*filename)) {
+            number = atoi(filename);
+            break;
+        }
+        filename++;
+    }
+    return number;
+}
+
 int main() {
 
-    char filename[] = "../data/data_with_duplicates.txt";
-    int n;
-    // int *arr = malloc(n * sizeof(int));
+    printf("data_name,sample_size,time,num_of_threads\n");
+    const char *files[NUM_FILES] = {
+        "../data/almost_sorted_data_1000.txt",
+        "../data/almost_sorted_data_100000.txt",
+        "../data/almost_sorted_data_1000000.txt",
+        "../data/data_with_duplicates_1000.txt",
+        "../data/data_with_duplicates_100000.txt",
+        "../data/data_with_duplicates_1000000.txt",
+        "../data/random_data_1000.txt",
+        "../data/random_data_100000.txt",
+        "../data/random_data_1000000.txt"
+    };
+    for(int threads_number = 1; threads_number <= 8; threads_number++)
+    {
+        int real_threads = 0;
 
-    int *arr = load_numbers(filename, &n);
-    // Losowe wartości
-    // for (int i = 0; i < n; i++) {
-    //     arr[i] = rand() % 1000000;
-    // }
+        for (int idx = 0; idx < NUM_FILES; idx++)
+        {
+            int n;
+            int *arr = load_numbers(files[idx], &n);
 
-    printf("Przed sortowaniem:\n");
-    for (int i = 0; i < n; i++) printf("%d ", arr[i]);
-    printf("\n");
+            int max_depth = 20;
+            
+            omp_set_num_threads(threads_number);
 
-    int max_depth = 10;
-
-    double start = omp_get_wtime();
+            double start = omp_get_wtime();
 
     // Uruchom sortowanie w kontekście równoległym
     #pragma omp parallel
-    {
-        #pragma omp single
-        merge_sort_limited(arr, 0, n - 1, 0, max_depth);
+            {
+    #pragma omp single
+                merge_sort_limited(arr, 0, n - 1, 0, max_depth);
+                real_threads = omp_get_num_threads();   // <- działa poprawnie
+            }
+
+            double end = omp_get_wtime();
+
+            int number_from_filename = extract_number_from_filename(files[idx]);
+            char* data_name = idx > 2 ? (idx > 5 ? "duplicated" : "random") : "almost_sorted";
+
+            printf("%s,%d,%.6f,%d\n", data_name, number_from_filename, (end-start), real_threads);
+            free(arr);
+        }
     }
 
-    double end = omp_get_wtime();
-
-    printf("Po sortowaniu:\n");
-    for (int i = 0; i < n; i++) printf("%d ", arr[i]);
-    printf("\n");
-
-    printf("Czas sortowania: %.6f sekund\n", end - start);
-
-    free(arr);
     return 0;
 }

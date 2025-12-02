@@ -1,0 +1,10 @@
+data_name,sample_size,time,num_of_threads
+almost_sorted,1000,0.000169,1
+almost_sorted,100000,0.005797,1
+almost_sorted,1000000,0.065550,1
+random,1000,0.000072,1
+random,100000,0.008712,1
+random,1000000,0.092187,1
+duplicated,1000,0.000081,1
+duplicated,100000,0.012705,1
+duplicated,1000000,0.141099,1
