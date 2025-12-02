@@ -1,0 +1,10 @@
+data_name,sample_size,time
+almost_sorted_data,1000,0.000124
+data_with_duplicates,1000,0.000115
+random_data,1000,0.000148
+almost_sorted_data,100000,0.010886
+data_with_duplicates,100000,0.014652
+random_data,100000,0.028753
+almost_sorted_data,1000000,0.133517
+data_with_duplicates,1000000,0.177444
+random_data,1000000,0.455061
