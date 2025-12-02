@@ -9,6 +9,9 @@ def bucket_sort(list: list[int], num_buckets: int) -> list[int]:
     min_value = min(list)
     max_value = max(list)
 
+    if min_value == max_value:
+        return list
+
     bucket_range = (max_value - min_value) / num_buckets
     buckets = [[] for _ in range(num_buckets)]
 
@@ -32,7 +35,7 @@ def get_data(path:Path) -> list[int]:
 if __name__ == "__main__":
     start_time = time.time()
     workdir = pathlib.Path(__file__).parent.parent
-    data_path = workdir / "data/data_with_duplicates.txt"
+    data_path = workdir / "data/random_data.txt"
     data = get_data(data_path)
     num_buckets = 4
     sorted_data = bucket_sort(data, num_buckets)

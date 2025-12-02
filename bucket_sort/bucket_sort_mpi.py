@@ -1,23 +1,22 @@
 import mpi4py.MPI as MPI
 import time
 import pathlib
+import sys
 
-def get_data(file_path):
-    with open(file_path, 'r') as f:
-        lst = [int(line.strip()) for line in f]
-    return lst
+def bucket_sort(input_list, num_buckets):
+    if not input_list:
+        return []
 
-def bucket_sort(list, num_buckets):
-    if len(list) == 0:
-        return list
+    min_value = min(input_list)
+    max_value = max(input_list)
 
-    min_value = min(list)
-    max_value = max(list)
+    if min_value == max_value:
+        return input_list
 
     bucket_range = (max_value - min_value) / num_buckets
     buckets = [[] for _ in range(num_buckets)]
 
-    for value in list:
+    for value in input_list:
         index = int((value - min_value) / bucket_range)
         if index == num_buckets:
             index -= 1
@@ -29,33 +28,31 @@ def bucket_sort(list, num_buckets):
 
     return sorted_list
 
-
 if __name__ == "__main__":
-
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    workdir = pathlib.Path(__file__).parent.parent
-    data_path = workdir / "data/data_with_duplicates.txt"
-    
+    buckets = None
+    data = None
 
     if rank == 0:
-        data = get_data(data_path)
-        start_time = time.time()
+        try:
+            workdir = pathlib.Path(__file__).parent.parent
+            data_path = workdir / "data/random_data.txt"
+                
+            with open(data_path, 'r') as f:
+                data = [int(line.strip()) for line in f]
+                
+        except Exception as e:
+            print(f"Error reading file: {e}")
+            sys.exit(1)
 
+        start_time = time.time()
+        
         min_value = min(data)
         max_value = max(data)
-    else:
-        data = None
-        min_value = None
-        max_value = None
-        start_time = None
 
-    min_value = comm.bcast(min_value, root=0)
-    max_value = comm.bcast(max_value, root=0)
-
-    if rank == 0:
         bucket_range = (max_value - min_value + 1) / size
         buckets = [[] for _ in range(size)]
 
@@ -64,16 +61,14 @@ if __name__ == "__main__":
             if index == size:
                 index -= 1
             buckets[index].append(value)
-    else:
-        buckets = None
+            
 
     local_data = comm.scatter(buckets, root=0)
-    k = 4
-
-    local_sorted = bucket_sort(local_data, k)
-
+    local_sorted = bucket_sort(local_data, num_buckets=4) 
     gathered = comm.gather(local_sorted, root=0)
 
     if rank == 0:
         final_sorted = [x for sublist in gathered for x in sublist]
-        print("Execution time:", time.time() - start_time)
+        end_time = time.time()
+        
+        print(f"Execution time: {end_time - start_time:.4f} seconds")
