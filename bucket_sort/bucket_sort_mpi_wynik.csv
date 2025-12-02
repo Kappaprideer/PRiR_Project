@@ -1,0 +1,10 @@
+data_name,sample_size,time,num_of_processes
+almost_sorted_data,1000,0.000270,1
+data_with_duplicates,1000,0.000239,1
+random_data,1000,0.000307,1
+almost_sorted_data,100000,0.025253,1
+data_with_duplicates,100000,0.025210,1
+random_data,100000,0.038789,1
+almost_sorted_data,1000000,0.285880,1
+data_with_duplicates,1000000,0.317240,1
+random_data,1000000,0.508729,1
